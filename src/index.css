@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design tokens
+   Every color used anywhere in the app reads from one of these variables —
+   never a hard-coded hex in a component — so theme + accent switching only
+   ever has to happen in exactly one place.
+   ========================================================================== */
+
+:root {
+  --bg: #0a0b10;
+  --surface: #13151d;
+  --surface-raised: #1a1d29;
+  --border: #262a3a;
+  --border-strong: #363b52;
+  --text: #e8e9ee;
+  --text-muted: #8b8fa3;
+  --text-faint: #5b5f74;
+
+  --danger: #f87171;
+  --danger-rgb: 248, 113, 113;
+  --success: #34d399;
+  --warning: #fbbf24;
+
+  /* Overridden at runtime via JS from the user's chosen accent preset/custom color. */
+  --accent: #22d3ee;
+  --accent-rgb: 34, 211, 238;
+
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  --radius-lg: 1rem;
+  --radius-md: 0.65rem;
+  --shadow-modal: 0 20px 60px -12px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f6f6fa;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --border: #e4e4ec;
+  --border-strong: #d3d3e0;
+  --text: #14151d;
+  --text-muted: #63667a;
+  --text-faint: #9698a8;
+  --shadow-modal: 0 20px 60px -12px rgba(20, 21, 29, 0.25);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: rgba(var(--accent-rgb), 0.35);
+  color: var(--text);
+}
+
+/* Thin, quiet scrollbars that still work fine if the browser ignores them. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: 8px;
+}
+
+/* Visible, accent-colored focus ring everywhere, keyboard nav included. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ==========================================================================
+   Motion
+   Exactly one deliberate animated moment (task completion) plus fast,
+   restrained transitions on direct interaction. Respected everywhere,
+   overridden to near-zero for anyone who has asked their OS to reduce
+   motion, or who turns animations off in Settings via the .no-motion class.
+   ========================================================================== */
+
+@keyframes nx-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes nx-check-draw {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes nx-toast-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes nx-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes nx-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(var(--accent-rgb), 0); }
+}
+
+.animate-nx-pop { animation: nx-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-nx-toast-in { animation: nx-toast-in 0.28s ease-out both; }
+.animate-nx-fade-in { animation: nx-fade-in 0.2s ease-out both; }
+.animate-nx-glow-pulse { animation: nx-glow-pulse 1.6s ease-out 1; }
+.nx-check-path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: nx-check-draw 0.28s ease-out 0.05s forwards;
+}
+
+.no-motion, .no-motion * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Small reusable utilities — accent glow is used sparingly and with intent,
+   never as blanket decoration.
+   ========================================================================== */
+
+@layer utilities {
+  .glow-accent {
+    box-shadow:
+      0 0 0 1px rgba(var(--accent-rgb), 0.35),
+      0 0 28px -6px rgba(var(--accent-rgb), 0.55);
+  }
+  .glow-accent-sm {
+    box-shadow: 0 0 14px -3px rgba(var(--accent-rgb), 0.5);
+  }
+  .text-glow {
+    text-shadow: 0 0 18px rgba(var(--accent-rgb), 0.45);
+  }
+  .bg-surface-hatch {
+    background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+}
+
